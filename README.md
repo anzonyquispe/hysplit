@@ -178,6 +178,14 @@ hysplit.trajectory_plot(trajectory_df)
 trajectory_model.trajectory_plot()
 ```
 
+The visualization shows trajectory paths with markers at each hourly position:
+
+<img src="docs/figures/trajectory_plot.png" width="100%">
+
+Height profiles show how the air mass altitude changes along the trajectory:
+
+<img src="docs/figures/height_profile.png" width="100%">
+
 ## HYSPLIT Dispersion Runs
 
 Dispersion models can also be conveniently built and executed. Begin the process with the `create_dispersion_model()` function. Use one or more `add_dispersion_params()` calls to write parameters to the model object. The `add_source()` method defines emission sources and properties.
@@ -252,6 +260,10 @@ Dispersion data can also be plotted onto a map. Use the `dispersion_plot()` func
 # Plot particle data onto a map
 dispersion_model.dispersion_plot()
 ```
+
+The visualization shows particle positions at each hour, with colors indicating time progression:
+
+<img src="docs/figures/dispersion_plot.png" width="100%">
 
 ## Cluster Computing (HPC) Workflows
 
