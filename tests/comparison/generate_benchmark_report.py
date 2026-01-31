@@ -43,7 +43,7 @@ with PdfPages(pdf_path) as pdf:
     ax.axis('off')
 
     title_text = f"""
-    PySplit vs splitr Performance Benchmark Report
+    HySplit vs splitr Performance Benchmark Report
     =============================================
 
     Benchmark Configuration:
@@ -63,7 +63,7 @@ with PdfPages(pdf_path) as pdf:
     +-----------------+----------+----------+----------+
 
     Key Finding:
-    Python (pysplit) is {r_total/py_total:.1%} faster than R (splitr).
+    Python (hysplit) is {r_total/py_total:.1%} faster than R (splitr).
     However, both are limited by the HYSPLIT binary execution time.
     """
 
@@ -77,7 +77,7 @@ with PdfPages(pdf_path) as pdf:
 
     # Total time comparison
     ax = axes[0]
-    languages = ['R (splitr)', 'Python (pysplit)']
+    languages = ['R (splitr)', 'Python (hysplit)']
     times = [r_total, py_total]
     colors = ['#E74C3C', '#3498DB']
     bars = ax.bar(languages, times, color=colors, edgecolor='black', linewidth=1.5)
@@ -123,7 +123,7 @@ with PdfPages(pdf_path) as pdf:
     wedges, texts, autotexts = ax.pie(sizes, explode=explode, labels=labels, colors=colors,
                                        autopct='%1.0f%%', shadow=True, startangle=90,
                                        textprops={'fontsize': 11})
-    ax.set_title('Time Breakdown per Run\n(Python pysplit)', fontsize=14, fontweight='bold')
+    ax.set_title('Time Breakdown per Run\n(Python hysplit)', fontsize=14, fontweight='bold')
 
     # R breakdown (similar)
     ax = axes[1]
@@ -148,7 +148,7 @@ with PdfPages(pdf_path) as pdf:
     width = 0.35
 
     bars1 = ax.bar(x - width/2, r_times, width, label='R (splitr)', color='#E74C3C', edgecolor='black')
-    bars2 = ax.bar(x + width/2, py_times, width, label='Python (pysplit)', color='#3498DB', edgecolor='black')
+    bars2 = ax.bar(x + width/2, py_times, width, label='Python (hysplit)', color='#3498DB', edgecolor='black')
 
     ax.set_ylabel('Time (milliseconds)', fontsize=12)
     ax.set_title('Component-Level Performance Comparison', fontsize=14, fontweight='bold')
@@ -176,7 +176,7 @@ with PdfPages(pdf_path) as pdf:
     parallel_8 = [py_per_run * n / 60 / 8 for n in runs]  # 8 cores
 
     ax.plot(runs, r_projected, 'o-', color='#E74C3C', linewidth=2, markersize=8, label='R (splitr)')
-    ax.plot(runs, py_projected, 's-', color='#3498DB', linewidth=2, markersize=8, label='Python (pysplit)')
+    ax.plot(runs, py_projected, 's-', color='#3498DB', linewidth=2, markersize=8, label='Python (hysplit)')
     ax.plot(runs, parallel_8, '^--', color='#27AE60', linewidth=2, markersize=8, label='Python (8 cores parallel)')
 
     ax.set_xlabel('Number of Trajectory Runs', fontsize=12)
@@ -223,7 +223,7 @@ with PdfPages(pdf_path) as pdf:
     4. PARALLEL EXECUTION IS THE KEY TO SPEEDUP
        - 8 cores = 8x speedup potential
        - Python's multiprocessing is more efficient
-       - pysplit includes batch processing utilities
+       - hysplit includes batch processing utilities
 
     5. RECOMMENDATIONS FOR MAXIMUM PERFORMANCE
        - Use run_batch_trajectories() for parallel execution
