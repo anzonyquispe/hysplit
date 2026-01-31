@@ -1,0 +1,113 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "numpy>=1.20"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hysplit"
+version = "0.1.0"
+description = "Python interface to HYSPLIT atmospheric transport model - A port of the R splitr package"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "HySplit Contributors"}
+]
+maintainers = [
+    {name = "HySplit Contributors"}
+]
+keywords = [
+    "hysplit",
+    "atmospheric",
+    "transport",
+    "trajectory",
+    "dispersion",
+    "meteorology",
+    "noaa",
+    "splitr",
+    "air-quality",
+    "lagrangian"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.20",
+    "pandas>=1.3",
+    "requests>=2.25",
+]
+
+[project.optional-dependencies]
+viz = [
+    "folium>=0.12",
+    "matplotlib>=3.4",
+]
+cluster = [
+    "dask>=2021.1",
+    "distributed>=2021.1",
+]
+all = [
+    "folium>=0.12",
+    "matplotlib>=3.4",
+    "dask>=2021.1",
+    "distributed>=2021.1",
+]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "mypy>=0.900",
+    "flake8>=4.0",
+    "build>=0.7",
+    "twine>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/quishpi/hysplit"
+Documentation = "https://github.com/quishpi/hysplit#readme"
+Repository = "https://github.com/quishpi/hysplit"
+Issues = "https://github.com/quishpi/hysplit/issues"
+Changelog = "https://github.com/quishpi/hysplit/releases"
+
+[tool.setuptools]
+packages = ["hysplit", "hysplit.core", "hysplit.met", "hysplit.io", "hysplit.viz", "hysplit.cpp", "hysplit.workflows"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+hysplit = ["bin/**/*", "py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
