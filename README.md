@@ -1,4 +1,4 @@
-# hysplit <img src="docs/figures/logo.png" align="right" height="180px" />
+# hysplit 
 
 <!-- badges: start -->
 [![PyPI version](https://badge.fury.io/py/hysplit.svg)](https://badge.fury.io/py/hysplit)
