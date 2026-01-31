@@ -21,7 +21,7 @@ except ImportError:
 base_dir = Path("/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/tests/comparison")
 
 print("=" * 70)
-print("COMPARISON OF R (splitr) vs PYTHON (pysplit) RESULTS")
+print("COMPARISON OF R (splitr) vs PYTHON (hysplit) RESULTS")
 print("=" * 70)
 
 # Load trajectory data
@@ -108,12 +108,12 @@ if HAS_MATPLOTLIB:
         fig, ax = plt.subplots(figsize=(11, 8.5))
         ax.axis('off')
         title_text = """
-PySplit vs splitr Comparison Report
+HySplit vs splitr Comparison Report
 ====================================
 
 This report compares outputs from:
 - R splitr package (original)
-- Python pysplit package (port)
+- Python hysplit package (port)
 
 Test Case: Trajectory Model
 - Location: 42.83752°N, 80.30364°W (Ontario, Canada)
@@ -158,7 +158,7 @@ Results Summary:
                   marker='*', zorder=10, label='Start')
         ax.set_xlabel('Longitude')
         ax.set_ylabel('Latitude')
-        ax.set_title('Python (pysplit) Trajectories')
+        ax.set_title('Python (hysplit) Trajectories')
         ax.legend(loc='best', fontsize=8)
         ax.grid(True, alpha=0.3)
 
@@ -284,7 +284,7 @@ Dispersion Model Results:
 
 Conclusion:
 -----------
-The Python pysplit package successfully replicates the R splitr
+The Python hysplit package successfully replicates the R splitr
 package's trajectory modeling functionality. All numeric outputs
 match exactly between the two implementations.
 

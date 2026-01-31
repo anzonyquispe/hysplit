@@ -16,7 +16,7 @@
 ## Session History
 
 ### Session 2 - 2026-01-31
-- **Renamed package from `pysplit` to `hysplit`**
+- **Renamed package from `hysplit` to `hysplit`**
 - Created comprehensive README.md matching R package style
 - Created tutorial Jupyter Notebook: `docs/tutorials/getting_started.ipynb`
 - Updated pyproject.toml for PyPI publishing

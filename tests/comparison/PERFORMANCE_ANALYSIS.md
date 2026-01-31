@@ -1,8 +1,8 @@
-# PySplit vs splitr Performance Analysis
+# HySplit vs splitr Performance Analysis
 
 ## Executive Summary
 
-| Metric | R (splitr) | Python (pysplit) | Speedup |
+| Metric | R (splitr) | Python (hysplit) | Speedup |
 |--------|------------|------------------|---------|
 | **Total Time (120 runs)** | 22.81 sec | 21.70 sec | **1.05x faster** |
 | **Mean time per run** | 0.190 sec | 0.181 sec | **1.05x faster** |
@@ -66,7 +66,7 @@ Python/pandas is ~30% faster for data manipulation.
 
 ## Where C++ Optimizations Help
 
-The C++ optimizations in pysplit target the **non-binary portions**:
+The C++ optimizations in hysplit target the **non-binary portions**:
 
 1. **Trajectory file parsing** - Reading and parsing HYSPLIT output files
 2. **Binary met data reading** - Direct reading of meteorological files for validation
@@ -106,7 +106,7 @@ The HYSPLIT binary dominates, so parallel execution is the real path to speedup.
 ### 1. Parallel Execution (Biggest Impact)
 
 ```python
-from pysplit.workflows import run_batch_trajectories, create_batch_config
+from hysplit.workflows import run_batch_trajectories, create_batch_config
 
 # Run on 8 CPU cores
 config = create_batch_config(
@@ -122,7 +122,7 @@ Expected speedup: **8x with 8 cores**
 ### 2. Pre-download Meteorological Data
 
 ```python
-from pysplit.workflows import download_met_data
+from hysplit.workflows import download_met_data
 
 # Download once, run many times
 manifest = download_met_data(
@@ -148,7 +148,7 @@ Run 1000 trajectories in parallel across cluster nodes.
 
 ## Conclusion
 
-- **Python pysplit is ~5% faster than R splitr** for identical workloads
+- **Python hysplit is ~5% faster than R splitr** for identical workloads
 - **The HYSPLIT binary is the bottleneck** (98% of runtime), not the wrapper language
 - **C++ optimizations help with file I/O**, providing 5-10x speedup for parsing
 - **Parallel execution is the key to real speedups** - use batch processing

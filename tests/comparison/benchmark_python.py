@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Python Performance Benchmark for pysplit
+Python Performance Benchmark for hysplit
 This script benchmarks various components to identify bottlenecks
 """
 
@@ -17,21 +17,21 @@ from typing import List, Dict, Any
 import pandas as pd
 import numpy as np
 
-from pysplit.core.trajectory import hysplit_trajectory
-from pysplit.core.config import set_config, set_ascdata
-from pysplit.io import trajectory_read
+from hysplit.core.trajectory import hysplit_trajectory
+from hysplit.core.config import set_config, set_ascdata
+from hysplit.io import trajectory_read
 
 # Configuration
 base_dir = Path("/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/tests/comparison")
 met_dir = base_dir / "met"
 out_dir = base_dir / "out_benchmark_py"
 results_file = base_dir / "benchmark_python_results.csv"
-binary_path = "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/pysplit/bin/osx/hyts_std"
+binary_path = "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/hysplit/bin/osx/hyts_std"
 
 out_dir.mkdir(parents=True, exist_ok=True)
 
 print("=" * 70)
-print("PYTHON (pysplit) PERFORMANCE BENCHMARK")
+print("PYTHON (hysplit) PERFORMANCE BENCHMARK")
 print("=" * 70)
 print()
 

@@ -1,4 +1,4 @@
-# PySplit vs splitr Comparison Results
+# HySplit vs splitr Comparison Results
 
 **Date:** 2026-01-31
 **R Version:** 4.5.2
@@ -6,7 +6,7 @@
 
 ## Summary
 
-| Feature | R (splitr) | Python (pysplit) | Match |
+| Feature | R (splitr) | Python (hysplit) | Match |
 |---------|-----------|------------------|-------|
 | Trajectory file parsing | ✓ | ✓ | **YES** |
 | SETUP.CFG generation | ✓ | ✓ | **YES** |
@@ -79,7 +79,7 @@ When available, the C++ parser provides 5-10x speedup for large trajectory files
 
 To check:
 ```python
-from pysplit.io.readers import HAS_CPP_EXTENSION
+from hysplit.io.readers import HAS_CPP_EXTENSION
 print(f"C++ extension: {HAS_CPP_EXTENSION}")
 ```
 
@@ -88,7 +88,7 @@ Python uses ThreadPoolExecutor for parallel meteorological data downloads, impro
 
 ## 4. Known Differences
 
-| Aspect | R (splitr) | Python (pysplit) |
+| Aspect | R (splitr) | Python (hysplit) |
 |--------|-----------|------------------|
 | Year format | Stores 2-digit (24) | Expands to 4-digit (2024) |
 | receptor column | Always present | Not included by default |
@@ -104,7 +104,7 @@ Python uses ThreadPoolExecutor for parallel meteorological data downloads, impro
 
 ## Conclusion
 
-The Python port (pysplit) successfully replicates the core functionality of the R splitr package:
+The Python port (hysplit) successfully replicates the core functionality of the R splitr package:
 
 - **Trajectory parsing**: Produces identical numerical results
 - **Configuration generation**: Creates equivalent HYSPLIT config files

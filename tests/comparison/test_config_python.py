@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit")
 
 from pathlib import Path
-from pysplit.core.config import set_config, set_ascdata
+from hysplit.core.config import set_config, set_ascdata
 
 test_dir = Path("/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/tests/comparison/config_test")
 test_dir.mkdir(exist_ok=True)

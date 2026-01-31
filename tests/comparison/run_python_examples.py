@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pandas as pd
 
-# Import pysplit
-from pysplit.core.trajectory import hysplit_trajectory, create_trajectory_model
-from pysplit.core.dispersion import hysplit_dispersion, create_dispersion_model
+# Import hysplit
+from hysplit.core.trajectory import hysplit_trajectory, create_trajectory_model
+from hysplit.core.dispersion import hysplit_dispersion, create_dispersion_model
 
 # Set working directories
 base_dir = Path("/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/tests/comparison")
@@ -27,8 +27,8 @@ out_dir.mkdir(parents=True, exist_ok=True)
 plot_dir.mkdir(parents=True, exist_ok=True)
 
 # HYSPLIT binary path
-binary_path = "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/pysplit/bin/osx/hyts_std"
-disp_binary_path = "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/pysplit/bin/osx/hycs_std"
+binary_path = "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/hysplit/bin/osx/hyts_std"
+disp_binary_path = "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/hysplit/bin/osx/hycs_std"
 
 print("=" * 60)
 print("PYSPLIT (PYTHON) TRAJECTORY AND DISPERSION EXAMPLES")

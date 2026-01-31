@@ -7,14 +7,14 @@ sys.path.insert(0, "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit")
 import pandas as pd
 from pathlib import Path
 
-# Import pysplit
-from pysplit.io.readers import trajectory_read
+# Import hysplit
+from hysplit.io.readers import trajectory_read
 
 # Set working directory
 test_dir = Path("/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/tests/comparison")
 
 # Read trajectory file
-print("Reading trajectory file with pysplit...")
+print("Reading trajectory file with hysplit...")
 traj_df = trajectory_read(test_dir)
 
 # Print summary
