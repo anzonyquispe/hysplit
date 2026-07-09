@@ -1,7 +1,7 @@
 """
 HySplit - Python interface to HYSPLIT atmospheric transport model.
 
-A Python port of the R splitr package with C++ optimizations for performance.
+A Python port of the R splitr package.
 """
 
 __version__ = "0.1.0"
@@ -23,7 +23,7 @@ from hysplit.met import (
 from hysplit.io import trajectory_read, dispersion_read
 from hysplit.viz import trajectory_plot, dispersion_plot
 
-# Workflow utilities for cluster computing
+# Workflow utilities for offline runs
 from hysplit.workflows import (
     download_met_data,
     create_met_manifest,
@@ -31,8 +31,6 @@ from hysplit.workflows import (
     run_trajectory_offline,
     run_dispersion_offline,
     load_met_manifest,
-    create_batch_config,
-    run_batch_trajectories,
 )
 
 __all__ = [
@@ -61,13 +59,11 @@ __all__ = [
     # Visualization
     "trajectory_plot",
     "dispersion_plot",
-    # Workflow utilities (cluster computing)
+    # Workflow utilities
     "download_met_data",
     "create_met_manifest",
     "validate_met_data",
     "run_trajectory_offline",
     "run_dispersion_offline",
     "load_met_manifest",
-    "create_batch_config",
-    "run_batch_trajectories",
 ]

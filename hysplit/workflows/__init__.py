@@ -1,5 +1,5 @@
 """
-Workflow utilities for cluster computing scenarios.
+Workflow utilities for offline/cluster computing scenarios.
 
 This module provides functionality to split HYSPLIT model runs into two phases:
 1. Download phase (requires internet) - downloads meteorological data
@@ -18,11 +18,6 @@ from hysplit.workflows.run import (
     run_dispersion_offline,
     load_met_manifest,
 )
-from hysplit.workflows.batch import (
-    create_batch_config,
-    run_batch_trajectories,
-    run_batch_dispersion,
-)
 
 __all__ = [
     # Download phase
@@ -33,8 +28,4 @@ __all__ = [
     "run_trajectory_offline",
     "run_dispersion_offline",
     "load_met_manifest",
-    # Batch processing
-    "create_batch_config",
-    "run_batch_trajectories",
-    "run_batch_dispersion",
 ]

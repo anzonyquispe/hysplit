@@ -29,6 +29,22 @@ def get_os() -> str:
         return "linux"
 
 
+def is_apple_silicon() -> bool:
+    """Check if running on Apple Silicon (arm64) Mac."""
+    return platform.system() == "Darwin" and platform.machine() == "arm64"
+
+
+def get_binary_command(binary_path: Path) -> List[str]:
+    """Get the command to run a binary, handling Apple Silicon compatibility.
+
+    On Apple Silicon Macs with x86_64 binaries, uses Rosetta 2 via arch -x86_64.
+    """
+    if is_apple_silicon():
+        # Use Rosetta 2 to run x86_64 binary on Apple Silicon
+        return ["arch", "-x86_64", str(binary_path)]
+    return [str(binary_path)]
+
+
 def get_binary_path(binary_name: str = "hyts_std") -> Path:
     """Get the path to the HYSPLIT binary for the current platform.
 
@@ -58,6 +74,29 @@ def get_binary_path(binary_name: str = "hyts_std") -> Path:
         "Please install HYSPLIT and ensure it's in your PATH, "
         "or provide a custom binary_path."
     )
+
+
+def _parse_date(date_input: Union[str, datetime]) -> datetime:
+    """Parse a date input to a datetime object.
+
+    Args:
+        date_input: Either a datetime object or a string in YYYY-MM-DD format
+
+    Returns:
+        datetime object
+    """
+    if isinstance(date_input, datetime):
+        return date_input
+    elif isinstance(date_input, str):
+        # Try common date formats
+        for fmt in ["%Y-%m-%d", "%Y/%m/%d", "%Y%m%d"]:
+            try:
+                return datetime.strptime(date_input, fmt)
+            except ValueError:
+                continue
+        raise ValueError(f"Unable to parse date string: {date_input}. Use YYYY-MM-DD format.")
+    else:
+        raise TypeError(f"Expected datetime or str, got {type(date_input).__name__}")
 
 
 def to_short_year(date: datetime) -> str:
@@ -122,6 +161,9 @@ class TrajectoryModel:
             self.ascdata = set_ascdata()
         if self.days is None:
             self.days = [datetime.now()]
+        else:
+            # Parse string dates to datetime objects
+            self.days = [_parse_date(d) for d in self.days]
 
         # Convert single values to lists for uniformity
         if isinstance(self.lat, (int, float)):
@@ -145,7 +187,9 @@ class TrajectoryModel:
         met_type: Optional[str] = None,
         vert_motion: Optional[int] = None,
         model_height: Optional[int] = None,
-        extended_met: Optional[bool] = None
+        extended_met: Optional[bool] = None,
+        met_dir: Optional[Union[str, Path]] = None,
+        exec_dir: Optional[Union[str, Path]] = None
     ) -> "TrajectoryModel":
         """Add or update trajectory parameters. Supports method chaining."""
         if lat is not None:
@@ -157,7 +201,8 @@ class TrajectoryModel:
         if duration is not None:
             self.duration = duration
         if days is not None:
-            self.days = days
+            # Parse string dates to datetime objects
+            self.days = [_parse_date(d) for d in days]
         if daily_hours is not None:
             self.daily_hours = daily_hours if isinstance(daily_hours, list) else [daily_hours]
         if direction is not None:
@@ -170,6 +215,10 @@ class TrajectoryModel:
             self.model_height = model_height
         if extended_met is not None:
             self.extended_met = extended_met
+        if met_dir is not None:
+            self.met_dir = met_dir
+        if exec_dir is not None:
+            self.exec_dir = exec_dir
 
         return self
 
@@ -206,10 +255,10 @@ class TrajectoryModel:
             str(len(met_files)),
         ]
 
-        # Add meteorological file paths
-        met_dir = self.met_dir or exec_dir
+        # Add meteorological file paths (use absolute paths)
+        met_dir_path = Path(self.met_dir).resolve() if self.met_dir else exec_dir
         for met_file in met_files:
-            lines.append(str(met_dir) + "/")
+            lines.append(str(met_dir_path) + "/")
             lines.append(met_file)
 
         # Output directory and filename
@@ -252,9 +301,9 @@ class TrajectoryModel:
         from hysplit.met import download_met_files
         from hysplit.io import trajectory_read
 
-        # Set up directories
-        exec_dir = Path(self.exec_dir) if self.exec_dir else Path(tempfile.mkdtemp())
-        met_dir = Path(self.met_dir) if self.met_dir else exec_dir
+        # Set up directories (use absolute paths for HYSPLIT)
+        exec_dir = Path(self.exec_dir).resolve() if self.exec_dir else Path(tempfile.mkdtemp())
+        met_dir = Path(self.met_dir).resolve() if self.met_dir else exec_dir
 
         # Ensure directories exist
         exec_dir.mkdir(parents=True, exist_ok=True)
@@ -314,8 +363,10 @@ class TrajectoryModel:
                     )
 
                     # Execute HYSPLIT
+                    cmd = get_binary_command(binary_path)
+                    # Debug: print(f"DEBUG: Running command: {cmd}")
                     result = subprocess.run(
-                        [str(binary_path)],
+                        cmd,
                         cwd=str(exec_dir),
                         capture_output=True,
                         text=True

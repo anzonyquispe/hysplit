@@ -24,9 +24,7 @@ This model has many applications:
 - **Easy-to-use API**: Build and run HYSPLIT models with minimal code
 - **Method chaining**: Fluent interface similar to pandas/dplyr pipelines
 - **Automatic met data**: Downloads meteorological files from NOAA servers
-- **Cluster computing support**: Pre-download data for offline HPC execution
 - **Interactive visualization**: Maps with Folium, plots with Matplotlib
-- **C++ optimizations**: Fast file parsing and data processing
 - **Full pandas integration**: Filter, group, aggregate results with pandas
 
 ## Installation
@@ -138,11 +136,11 @@ Here, we create a `TrajectoryModel` object which serves as a container for the m
 
 This pipeline setup allows for more flexibility as Python objects can be piped in for variation in the types of models created. The `create_trajectory_model()` function creates the trajectory model object. One or more `add_trajectory_params()` calls can be used to write model parameters to the model object. Ending the pipeline with `run()` runs the model and creates results.
 
-The trajectory data can be extracted from the trajectory model object using the `get_output_tbl()` method:
+The trajectory data can be extracted from the trajectory model object using the `get_output()` method:
 
 ```python
 # Get a DataFrame containing the model results
-trajectory_df = trajectory_model.get_output_tbl()
+trajectory_df = trajectory_model.get_output()
 
 print(trajectory_df)
 ```
@@ -190,7 +188,7 @@ Height profiles show how the air mass altitude changes along the trajectory:
 
 Dispersion models can also be conveniently built and executed. Begin the process with the `create_dispersion_model()` function. Use one or more `add_dispersion_params()` calls to write parameters to the model object. The `add_source()` method defines emission sources and properties.
 
-As with the trajectory model, the pipeline can be ended with `run()`. To extract a DataFrame containing the modeled output data, use the `get_output_tbl()` method. An example:
+As with the trajectory model, the pipeline can be ended with `run()`. To extract a DataFrame containing the modeled output data, use the `get_output()` method. An example:
 
 ```python
 import hysplit
@@ -236,7 +234,7 @@ The output data can be extracted from the dispersion model object:
 
 ```python
 # Get a DataFrame containing the model results
-dispersion_df = dispersion_model.get_output_tbl()
+dispersion_df = dispersion_model.get_output()
 print(dispersion_df)
 ```
 
@@ -265,72 +263,6 @@ The visualization shows particle positions at each hour, with colors indicating 
 
 <img src="docs/figures/dispersion_plot.png" width="100%">
 
-## Cluster Computing (HPC) Workflows
-
-For high-performance computing environments without internet access, the package supports a two-phase workflow:
-
-### Phase 1: Download Meteorological Data (machine with internet)
-
-```python
-from hysplit.workflows import download_met_data, create_met_manifest
-
-# Download all needed met files
-manifest = download_met_data(
-    met_type="reanalysis",
-    start_date="2012-01-01",
-    end_date="2012-12-31",
-    output_dir="/data/met/reanalysis",
-    buffer_days=2,           # Extra days for boundary conditions
-    compute_checksums=True   # For data validation
-)
-
-# Save manifest for transfer to cluster
-create_met_manifest(manifest, "/data/met/manifest.json")
-```
-
-### Phase 2: Run Models on Cluster (offline)
-
-```python
-from hysplit.workflows import run_trajectory_offline, load_met_manifest
-
-# Load pre-downloaded manifest
-manifest = load_met_manifest("/scratch/met/manifest.json")
-
-# Run trajectory without internet
-trajectory = run_trajectory_offline(
-    lat=42.83752,
-    lon=-80.30364,
-    height=50,
-    duration=24,
-    days=["2012-03-12"],
-    met_manifest=manifest,
-    exec_dir="/scratch/output"
-)
-```
-
-### Batch Processing with Parallel Execution
-
-```python
-from hysplit.workflows import create_batch_config, run_batch_trajectories
-
-# Define batch configuration
-config = create_batch_config(
-    locations=[
-        {"lat": 42.83752, "lon": -80.30364},
-        {"lat": 43.65107, "lon": -79.34702},
-        {"lat": 45.50169, "lon": -73.56725},
-    ],
-    days=["2012-03-10", "2012-03-11", "2012-03-12"],
-    daily_hours=[0, 6, 12, 18],
-    duration=48,
-    met_dir="/data/met",
-    exec_dir="/scratch/output"
-)
-
-# Run with 8 parallel workers
-results = run_batch_trajectories(config, n_workers=8)
-```
-
 ## Meteorological Data Types
 
 | Type | Description | Resolution | Coverage |
@@ -346,15 +278,6 @@ results = run_batch_trajectories(config, n_workers=8)
 ## Performance
 
 Python **hysplit** is approximately 5% faster than R **splitr** for identical workloads. The bottleneck is the HYSPLIT Fortran binary (98% of runtime), which both packages call.
-
-The package includes C++ optimizations for file parsing:
-
-| Operation | Pure Python | With C++ | Speedup |
-|-----------|-------------|----------|---------|
-| Trajectory parsing | ~10 ms | ~1 ms | **10x** |
-| Binary met reading | ~50 ms | ~5 ms | **10x** |
-
-For maximum performance, use parallel batch processing with `run_batch_trajectories()`.
 
 ## HYSPLIT Citations
 

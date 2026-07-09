@@ -165,8 +165,12 @@ def download_met_data(
                     print(f"  Computed checksum for {filename}")
             manifest["files"].append(file_info)
 
+    # Calculate total size
+    total_size = sum(f["size_bytes"] for f in manifest["files"])
+    manifest["total_size_bytes"] = total_size
+    manifest["total_size_mb"] = total_size / (1024 * 1024)
+
     if verbose:
-        total_size = sum(f["size_bytes"] for f in manifest["files"])
         print(f"Total download size: {total_size / (1024**3):.2f} GB")
 
     return manifest
@@ -276,6 +280,11 @@ def validate_met_data(
                 results["valid"] = False
                 if verbose:
                     print(f"  CORRUPT: {filename}")
+
+    # Add convenience fields for notebook compatibility
+    valid_count = results["total_files"] - len(results["missing_files"]) - len(results["corrupt_files"])
+    results["valid_files"] = valid_count
+    results["status"] = "PASSED" if results["valid"] else "FAILED"
 
     if verbose:
         if results["valid"]:
