@@ -1,0 +1,189 @@
+ Simulation Date (CCYYMMDD): 20260131
+ Simulation Time (HHMMSS.S): 165545.746
+ WARNING: metini - FLUXES not found in data (kg,kt)           1           1
+ Setting KBLS=2 to use the wind/temp profiles!
+ 
+   KG   KT DATA  SIZE   NX   NY
+    1    1 CDC1 278.0  144   73
+ 
+  NOTICE   main: number meteo grids and times -            1           1
+  
+ HYSPLIT4
+ Last Changed Rev: 720
+ Last Changed Date: 2015-02-18 09:22:12 -0500 (Wed, 18 Feb 2015)
+ 
+ ------------- Start Namelist configuration -------------------
+ Internal grid parameters (nlvl,aa,bb,cc):           27   30.00000    
+  -25.00000       5.000000    
+ &SETUP
+ INITD   =           0,
+ KHMAX   =        9999,
+ NUMPAR  =        2500,
+ MAXPAR  =       10000,
+ MAXDIM  =           1,
+ QCYCLE  =  0.0000000E+00,
+ P10F    =  0.0000000E+00,
+ KMIXD   =           0,
+ KMIX0   =         250,
+ FRME    =  0.0000000E+00,
+ FRMR    =  0.0000000E+00,
+ KRND    =           6,
+ DELT    =  0.0000000E+00,
+ KDEF    =           0,
+ TKERD   =  0.1800000    ,
+ TKERN   =  0.1800000    ,
+ NDUMP   =           1,
+ NCYCL   =           1,
+ TRATIO  =  0.7500000    ,
+ ISOT    =         -99,
+ MGMIN   =          10,
+ KMSL    =           0,
+ NSTR    =           0,
+ MHRS    =        9999,
+ NVER    =           0,
+ CPACK   =           1,
+ CMASS   =           0,
+ ICHEM   =           0,
+ EFILE   =                                                                                 ,
+ VSCALE  =   100.0000    ,
+ VSCALEU =   100.0000    ,
+ VSCALES =   100.0000    ,
+ K10M    =           1,
+ VDIST   =                                                                                 ,
+ KHINP   =           0,
+ PINBC   =                                                                                 ,
+ HSCALE  =   10800.00    ,
+ TOUT    =          60,
+ TM_PRES =           1,
+ TM_TPOT =           0,
+ TM_TAMB =           0,
+ TM_RAIN =           0,
+ TM_MIXD =           0,
+ TM_TERR =           0,
+ TM_DSWF =           0,
+ TM_RELH =           0,
+ TM_SPHU =           0,
+ TM_MIXR =           0,
+ DXF     =   1.000000    ,
+ DYF     =   1.000000    ,
+ DZF     =  9.9999998E-03,
+ PINPF   = PARINIT                                                                         ,
+ POUTF   = PARDUMP                                                                         ,
+ NINIT   =           1,
+ KAGL    =           1,
+ KPUFF   =           0,
+ KBLT    =           2,
+ KZMIX   =           0,
+ TVMIX   =   1.000000    ,
+ KBLS    =           1,
+ CONAGE  =          48,
+ KSPL    =           1,
+ FRHS    =   1.000000    ,
+ FRVS    =  9.9999998E-03,
+ FRTS    =  0.1000000    ,
+ FRHMAX  =   3.000000    ,
+ SPLITF  =   1.000000    ,
+ MESSG   = MESSAGE                                                                         ,
+ NBPTYP  =           1,
+ RHB     =          80,
+ RHT     =          60,
+ OUTDT   =           0,
+ DECAY   =           1,
+ KWET    =           1,
+ KRAND   =           1,
+ CAPEMIN =  -1.000000    
+ /
+ ------------- End Namelist configuration -------------------
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  108   50
+  NOTICE metpos: (mtime,ftime) -     59008320           0
+  NOTICE metpos: (mtime,ftime) -     59008680           0
+  NOTICE advpnt: (kg,nx,ny,nz) -     1   10   10   27
+  NOTICE sfcinp: reading ASCDATA.CFG
+  NOTICE sfcinp: LANDUSE.ASC file not found
+  On default directory:.
+  Using default value category 2 agricultural
+  NOTICE sfcinp: ROUGLEN.ASC file not found
+  On default directory:.
+  Using default value 0.20 m
+  NOTICE metgrd: (kg, xyr,xy1) -     1   10   10  108   50
+  NOTICE metinp: CDC1 1 4137   10   10  108   50 59008320 12  3 12  0
+  NOTICE metinp: CDC1 1 4231   10   10  108   50 59008680 12  3 12  6
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  108   50
+  NOTICE   main: Initial time step (min)           60
+  NOTICE   main:     59008380           1           1          60   112.9609    
+   54.19363      0.9980116    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  108   50
+  NOTICE   main:     59008440           1           1         120   113.0352    
+   54.25053      0.9980474    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008500           1           1         180   113.1000    
+   54.30549      0.9980855    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008560           1           1         240   113.1554    
+   54.35836      0.9981260    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008620           1           1         300   113.2024    
+   54.40898      0.9981686    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008680           1           1         360   113.2420    
+   54.45722      0.9982131    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE metpos: (mtime,ftime) -     59009040    59008320
+  NOTICE metinp: CDC1 1 4325   10   10  108   50 59009040 12  3 12 12
+  NOTICE   main:     59008740           1           1         420   113.2766    
+   54.50307      0.9982576    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008800           1           1         480   113.3079    
+   54.54651      0.9983009    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008860           1           1         540   113.3345    
+   54.58750      0.9983440    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008920           1           1         600   113.3553    
+   54.62605      0.9983878    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59008980           1           1         660   113.3691    
+   54.66213      0.9984329    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59009040           1           1         720   113.3747    
+   54.69567      0.9984796    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE metpos: (mtime,ftime) -     59009400    59008680
+  NOTICE metinp: CDC1 1 4419   10   10  108   50 59009400 12  3 12 18
+  NOTICE   main:     59009100           1           1         780   113.3716    
+   54.73068      0.9985178    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59009160           1           1         840   113.3591    
+   54.77131      0.9985380    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59009220           1           1         900   113.3367    
+   54.81808      0.9985408    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59009280           1           1         960   113.3040    
+   54.87168      0.9985263    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59009340           1           1        1020   113.2604    
+   54.93298      0.9984944    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   50
+  NOTICE   main:     59009400           1           1        1080   113.2056    
+   55.00297      0.9984442    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   51
+  NOTICE metpos: (mtime,ftime) -     59009760    59009040
+  NOTICE metinp: CDC1 1 4513   10   10  108   50 59009760 12  3 13  0
+  NOTICE   main:     59009460           1           1        1140   113.1437    
+   55.07776      0.9983801    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   51
+  NOTICE   main:     59009520           1           1        1200   113.0797    
+   55.15301      0.9983063    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   51
+  NOTICE   main:     59009580           1           1        1260   113.0139    
+   55.22885      0.9982216    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  109   51
+  NOTICE   main:     59009640           1           1        1320   112.9474    
+   55.30557      0.9981241    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  108   51
+  NOTICE   main:     59009700           1           1        1380   112.8816    
+   55.38345      0.9980112    
+  NOTICE advrng: (kg ,xyr,xy1) -  1   10   10  108   51
+  NOTICE   main:     59009760           1           1        1440   112.8177    
+   55.46269      0.9978808    

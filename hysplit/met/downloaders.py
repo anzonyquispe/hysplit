@@ -14,6 +14,29 @@ import logging
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
+def _parse_date(date_input: Union[str, datetime]) -> datetime:
+    """Parse a date input to a datetime object.
+
+    Args:
+        date_input: Either a datetime object or a string in YYYY-MM-DD format
+
+    Returns:
+        datetime object
+    """
+    if isinstance(date_input, datetime):
+        return date_input
+    elif isinstance(date_input, str):
+        # Try common date formats
+        for fmt in ["%Y-%m-%d", "%Y/%m/%d", "%Y%m%d"]:
+            try:
+                return datetime.strptime(date_input, fmt)
+            except ValueError:
+                continue
+        raise ValueError(f"Unable to parse date string: {date_input}. Use YYYY-MM-DD format.")
+    else:
+        raise TypeError(f"Expected datetime or str, got {type(date_input).__name__}")
+
 # NOAA FTP server URLs for different meteorological data
 MET_URLS = {
     "gdas1": "ftp://arlftp.arlhq.noaa.gov/archives/gdas1",
@@ -60,28 +83,31 @@ def _download_file(url: str, filepath: Path, timeout: int = 300) -> bool:
 
 
 def _get_date_range(
-    days: List[datetime],
+    days: List[Union[datetime, str]],
     duration: int,
     direction: str
 ) -> tuple[datetime, datetime]:
     """Get the date range needed for meteorological data.
 
     Args:
-        days: List of run dates
+        days: List of run dates (datetime objects or strings in YYYY-MM-DD format)
         duration: Model run duration in hours
         direction: "forward" or "backward"
 
     Returns:
         Tuple of (min_date, max_date)
     """
+    # Parse string dates to datetime objects
+    parsed_days = [_parse_date(d) for d in days]
+
     if direction == "backward":
-        min_date = (min(days) - timedelta(hours=duration)).replace(
+        min_date = (min(parsed_days) - timedelta(hours=duration)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
-        max_date = max(days).replace(hour=0, minute=0, second=0, microsecond=0)
+        max_date = max(parsed_days).replace(hour=0, minute=0, second=0, microsecond=0)
     else:
-        min_date = min(days).replace(hour=0, minute=0, second=0, microsecond=0)
-        max_date = (max(days) + timedelta(hours=duration)).replace(
+        min_date = min(parsed_days).replace(hour=0, minute=0, second=0, microsecond=0)
+        max_date = (max(parsed_days) + timedelta(hours=duration)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
 

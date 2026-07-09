@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 
 from hysplit.core.config import HysplitConfig, AscdataConfig, set_config, set_ascdata
-from hysplit.core.trajectory import get_binary_path, get_os
+from hysplit.core.trajectory import get_binary_path, get_os, get_binary_command
 
 
 @dataclass
@@ -103,13 +103,48 @@ class DispersionModel:
         rate: float = 1.0,
         area: float = 0.0,
         heat: float = 0.0,
-        particle_diameter: float = 1.0,
-        particle_density: float = 1.0,
-        particle_shape: float = 1.0,
+        particle_diameter: Optional[float] = None,
+        particle_density: Optional[float] = None,
+        particle_shape: Optional[float] = None,
         start_time: Optional[datetime] = None,
-        duration_hours: float = 1.0
+        duration_hours: Optional[float] = None,
+        # Aliases for more intuitive parameter names
+        name: Optional[str] = None,  # Ignored, for documentation only
+        pdiam: Optional[float] = None,  # Alias for particle_diameter
+        density: Optional[float] = None,  # Alias for particle_density
+        shape_factor: Optional[float] = None,  # Alias for particle_shape
+        release_start: Optional[datetime] = None,  # Alias for start_time
+        release_end: Optional[datetime] = None,  # Alternative to duration_hours
     ) -> "DispersionModel":
-        """Add an emission source. Returns self for method chaining."""
+        """Add an emission source. Returns self for method chaining.
+
+        Args:
+            lat: Source latitude
+            lon: Source longitude
+            height: Emission height (m)
+            rate: Emission rate (mass/hour)
+            area: Source area (m^2)
+            heat: Heat release (watts)
+            particle_diameter: Particle diameter (micrometers), alias: pdiam
+            particle_density: Particle density (g/cm³), alias: density
+            particle_shape: Shape factor (1.0 = sphere), alias: shape_factor
+            start_time: Release start time, alias: release_start
+            duration_hours: Hours of emission
+            name: Optional source name (for documentation only)
+            release_end: Release end time (alternative to duration_hours)
+        """
+        # Handle aliases
+        actual_diameter = pdiam if pdiam is not None else (particle_diameter if particle_diameter is not None else 1.0)
+        actual_density = density if density is not None else (particle_density if particle_density is not None else 1.0)
+        actual_shape = shape_factor if shape_factor is not None else (particle_shape if particle_shape is not None else 1.0)
+        actual_start = release_start if release_start is not None else (start_time if start_time is not None else self.start_time)
+
+        # Calculate duration from release_end if provided
+        if release_end is not None and actual_start is not None:
+            actual_duration = (release_end - actual_start).total_seconds() / 3600.0
+        else:
+            actual_duration = duration_hours if duration_hours is not None else 1.0
+
         source = EmissionSource(
             lat=lat,
             lon=lon,
@@ -117,11 +152,11 @@ class DispersionModel:
             rate=rate,
             area=area,
             heat=heat,
-            particle_diameter=particle_diameter,
-            particle_density=particle_density,
-            particle_shape=particle_shape,
-            start_time=start_time or self.start_time,
-            duration_hours=duration_hours
+            particle_diameter=actual_diameter,
+            particle_density=actual_density,
+            particle_shape=actual_shape,
+            start_time=actual_start,
+            duration_hours=actual_duration
         )
         self.sources.append(source)
         return self
@@ -138,7 +173,9 @@ class DispersionModel:
         grid_center: Optional[tuple[float, float]] = None,
         grid_spacing: Optional[tuple[float, float]] = None,
         grid_span: Optional[tuple[float, float]] = None,
-        grid_levels: Optional[List[float]] = None
+        grid_levels: Optional[List[float]] = None,
+        met_dir: Optional[Union[str, Path]] = None,
+        exec_dir: Optional[Union[str, Path]] = None
     ) -> "DispersionModel":
         """Add or update dispersion parameters. Returns self for method chaining."""
         if start_time is not None:
@@ -163,6 +200,10 @@ class DispersionModel:
             self.grid_span_lat, self.grid_span_lon = grid_span
         if grid_levels is not None:
             self.grid_levels = grid_levels
+        if met_dir is not None:
+            self.met_dir = met_dir
+        if exec_dir is not None:
+            self.exec_dir = exec_dir
 
         return self
 
@@ -175,8 +216,9 @@ class DispersionModel:
         """Write HYSPLIT CONTROL file for dispersion."""
         control_path = exec_dir / "CONTROL"
 
-        # Duration direction
-        duration = self.duration if self.direction == "forward" else -self.duration
+        # Calculate actual duration from start/end times
+        actual_duration = int((self.end_time - self.start_time).total_seconds() / 3600)
+        duration = actual_duration if self.direction == "forward" else -actual_duration
 
         lines = [
             # Start time: YY MM DD HH
@@ -185,9 +227,9 @@ class DispersionModel:
             str(len(self.sources)),
         ]
 
-        # Add source locations
+        # Add source locations (lat lon height rate area heat)
         for source in self.sources:
-            lines.append(f"{source.lat:.4f} {source.lon:.4f} {source.height:.1f} {source.rate:.4f} {source.area:.1f} {source.heat:.1f}")
+            lines.append(f"{source.lat:.4f} {source.lon:.4f} {source.height:.1f} {source.rate:.1f} {source.area:.1f} {source.heat:.1f}")
 
         lines.extend([
             # Total run time (hours)
@@ -200,27 +242,29 @@ class DispersionModel:
             str(len(met_files)),
         ])
 
-        # Add meteorological file paths
-        met_dir = self.met_dir or exec_dir
+        # Add meteorological file paths (use absolute paths)
+        met_dir_path = Path(self.met_dir).resolve() if self.met_dir else exec_dir
         for met_file in met_files:
-            lines.append(str(met_dir) + "/")
+            lines.append(str(met_dir_path) + "/")
             lines.append(met_file)
 
         # Number of pollutant species
         lines.append("1")
-        # Pollutant identification
-        lines.append("PART")
-        # Emission rate (per hour)
-        lines.append("1.0")
-        # Hours of emission
-        lines.append(str(int(self.duration)))
-        # Release start time (relative to simulation start)
-        lines.append("00 00 00 00 00")
+        # Pollutant: ID RATE HOURS START_YY START_MM START_DD START_HH START_MM
+        source = self.sources[0] if self.sources else None
+        emit_rate = source.rate if source else 1.0
+        emit_hours = int(source.duration_hours) if source else self.duration
+        lines.append(f"PART")
+        lines.append(f"{emit_rate:.4f}")
+        lines.append(f"{emit_hours:d}")
+        lines.append(f"{self.start_time.strftime('%y %m %d %H')} 00")
 
         # Number of concentration grids
         lines.append("1")
-        # Grid center
-        lines.append(f"{self.grid_lat:.4f} {self.grid_lon:.4f}")
+        # Grid center (use source location if grid not specified)
+        grid_lat = self.grid_lat if self.grid_lat != 0.0 else (source.lat if source else 0.0)
+        grid_lon = self.grid_lon if self.grid_lon != 0.0 else (source.lon if source else 0.0)
+        lines.append(f"{grid_lat:.4f} {grid_lon:.4f}")
         # Grid spacing
         lines.append(f"{self.grid_spacing_lat:.4f} {self.grid_spacing_lon:.4f}")
         # Grid span
@@ -232,20 +276,24 @@ class DispersionModel:
 
         # Number of vertical levels
         lines.append(str(len(self.grid_levels)))
-        # Vertical levels
-        for level in self.grid_levels:
-            lines.append(f"{level:.1f}")
+        # Vertical levels (all on one line)
+        lines.append(" ".join(f"{level:.1f}" for level in self.grid_levels))
 
         # Sampling start, stop, interval
-        lines.append(f"{self.start_time.strftime('%y %m %d %H')} 00")
-        lines.append(f"{self.end_time.strftime('%y %m %d %H')} 00")
+        lines.append(f"{self.start_time.strftime('%y %m %d %H %M')}")
+        lines.append(f"{self.end_time.strftime('%y %m %d %H %M')}")
         lines.append(f"00 {self.sampling_interval:02d} 00")
 
-        # Deposition
+        # Deposition parameters (5 lines per pollutant)
         lines.append("1")  # Number of depositing pollutants
-        lines.append("0.0 0.0 0.0")  # Particle diameter, density, shape
-        lines.append("0.0 0.0 0.0 0.0 0.0")  # Deposition velocities
-        lines.append("0.0 0.0 0.0")  # Wet removal
+        pdiam = source.particle_diameter if source else 0.0
+        pdens = source.particle_density if source else 0.0
+        pshape = source.particle_shape if source else 0.0
+        lines.append(f"{pdiam:.1f} {pdens:.1f} {pshape:.1f}")  # Particle properties
+        lines.append("0.0 0.0 0.0 0.0 0.0")  # Dry deposition velocities
+        lines.append("0.0 0.0 0.0")  # Wet removal parameters
+        lines.append("0.0")  # Radioactive decay half-life (days)
+        lines.append("0.0")  # Resuspension factor (1/m)
 
         with open(control_path, "w") as f:
             f.write("\n".join(lines) + "\n")
@@ -260,9 +308,9 @@ class DispersionModel:
         if not self.sources:
             raise ValueError("No emission sources defined. Use add_source() first.")
 
-        # Set up directories
-        exec_dir = Path(self.exec_dir) if self.exec_dir else Path(tempfile.mkdtemp())
-        met_dir = Path(self.met_dir) if self.met_dir else exec_dir
+        # Set up directories (use absolute paths for HYSPLIT)
+        exec_dir = Path(self.exec_dir).resolve() if self.exec_dir else Path(tempfile.mkdtemp())
+        met_dir = Path(self.met_dir).resolve() if self.met_dir else exec_dir
 
         exec_dir.mkdir(parents=True, exist_ok=True)
         met_dir.mkdir(parents=True, exist_ok=True)
@@ -304,7 +352,7 @@ class DispersionModel:
 
         # Execute HYSPLIT dispersion model
         result = subprocess.run(
-            [str(binary_path)],
+            get_binary_command(binary_path),
             cwd=str(exec_dir),
             capture_output=True,
             text=True

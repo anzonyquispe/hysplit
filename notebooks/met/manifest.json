@@ -1,0 +1,29 @@
+{
+  "met_type": "reanalysis",
+  "start_date": "2012-03-01T00:00:00",
+  "end_date": "2012-03-31T00:00:00",
+  "buffered_start": "2012-02-28T00:00:00",
+  "buffered_end": "2012-04-02T00:00:00",
+  "buffer_days": 2,
+  "output_dir": "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/notebooks/met/reanalysis",
+  "download_timestamp": "2026-01-31T16:50:58.026825",
+  "files": [
+    {
+      "filename": "RP201202.gbl",
+      "size_bytes": 115168048,
+      "md5": "7949605d3a76105ca8ef26ddb271ebb6"
+    },
+    {
+      "filename": "RP201203.gbl",
+      "size_bytes": 123110672,
+      "md5": "3b73b1219e2309a139a0b539fdeb07c7"
+    },
+    {
+      "filename": "RP201204.gbl",
+      "size_bytes": 119139360,
+      "md5": "1207e32dcdcd975f1df363ec0d31190b"
+    }
+  ],
+  "total_size_bytes": 357418080,
+  "total_size_mb": 340.8604431152344
+}

@@ -249,48 +249,109 @@ def trajectory_read(
 def _parse_dispersion_pardump_python(filepath: Path) -> pd.DataFrame:
     """Parse PARDUMP file (particle dump) from dispersion model.
 
+    PARDUMP is a Fortran unformatted binary file containing particle
+    positions at each output time step.
+
     Args:
         filepath: Path to PARDUMP file
 
     Returns:
         DataFrame with particle positions
     """
+    import struct
+
     particles = []
+    particle_id = 0
 
     with open(filepath, 'rb') as f:
-        # PARDUMP is a binary file with specific format
-        # Header: number of particles, time info, etc.
         try:
             while True:
-                # Read record header (varies by HYSPLIT version)
-                header = f.read(4)
-                if not header or len(header) < 4:
+                # Read Fortran record length (4 bytes, big-endian int)
+                rec_len_bytes = f.read(4)
+                if not rec_len_bytes or len(rec_len_bytes) < 4:
                     break
 
-                # Simple text-based parsing for ASCII PARDUMP
-                f.seek(0)
-                content = f.read().decode('utf-8', errors='ignore')
+                rec_len = struct.unpack('>i', rec_len_bytes)[0]
 
-                # Parse as text
-                for line in content.split('\n'):
-                    parts = line.split()
-                    if len(parts) >= 4:
+                # Read record data
+                record_data = f.read(rec_len)
+                if len(record_data) < rec_len:
+                    break
+
+                # Read trailing record length
+                f.read(4)
+
+                # Parse based on record length
+                # Header records are typically 28 bytes (7 ints)
+                # Particle records are typically 24 bytes (1 int + 5 floats)
+
+                if rec_len == 28:
+                    # Header record: npar, year, month, day, hour, minute, ifhr
+                    if len(record_data) >= 28:
+                        header = struct.unpack('>7i', record_data[:28])
+                        # npar = header[0]  # number of particles
+                        # Could extract time info here if needed
+
+                elif rec_len == 4:
+                    # Small record (single value) - skip
+                    pass
+
+                elif rec_len == 24:
+                    # Particle position record: lat, lon, height, (other values)
+                    # Format: float lat, float lon, float height, ...
+                    if len(record_data) >= 24:
                         try:
-                            particles.append({
-                                'particle_i': parts[0],
-                                'lat': float(parts[1]),
-                                'lon': float(parts[2]),
-                                'height': float(parts[3]),
-                            })
-                        except ValueError:
-                            continue
-                break
+                            # Try big-endian floats
+                            values = struct.unpack('>6f', record_data[:24])
+                            lat, lon, height = values[0], values[1], values[2]
 
-        except Exception:
+                            # Validate lat/lon ranges and height (filter out marker records)
+                            if (-90 <= lat <= 90 and -180 <= lon <= 180 and
+                                    height >= 0 and height < 50000 and
+                                    abs(lat) > 0.01 and abs(lon) > 0.01):
+                                particle_id += 1
+                                particles.append({
+                                    'particle_i': f'{particle_id:05d}',
+                                    'lat': lat,
+                                    'lon': lon,
+                                    'height': height,
+                                })
+                        except struct.error:
+                            pass
+
+                elif rec_len == 20:
+                    # Alternative particle record format
+                    if len(record_data) >= 20:
+                        try:
+                            # 5 values: might be index + 4 floats or 5 floats
+                            values = struct.unpack('>5f', record_data[:20])
+                            lat, lon, height = values[0], values[1], values[2]
+                            # Validate with same filters
+                            if (-90 <= lat <= 90 and -180 <= lon <= 180 and
+                                    height >= 0 and height < 50000 and
+                                    abs(lat) > 0.01 and abs(lon) > 0.01):
+                                particle_id += 1
+                                particles.append({
+                                    'particle_i': f'{particle_id:05d}',
+                                    'lat': lat,
+                                    'lon': lon,
+                                    'height': height,
+                                })
+                        except struct.error:
+                            pass
+
+        except Exception as e:
+            # If binary parsing fails, return empty DataFrame
             pass
 
     if particles:
-        return pd.DataFrame(particles)
+        df = pd.DataFrame(particles)
+        # Post-processing: filter out obviously invalid records
+        df = df[(df['lat'].abs() > 0.01) & (df['lon'].abs() > 0.01)]
+        df = df[(df['height'] >= 0) & (df['height'] < 50000)]
+        # Reset particle IDs
+        df['particle_i'] = [f'{i+1:05d}' for i in range(len(df))]
+        return df.reset_index(drop=True)
     return pd.DataFrame(columns=['particle_i', 'lat', 'lon', 'height'])
 
 

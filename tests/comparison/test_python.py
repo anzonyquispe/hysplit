@@ -1,41 +1,68 @@
 #!/usr/bin/env python3
-"""Python script to test trajectory_read and output CSV for comparison."""
+"""Test hysplit package imports and basic functionality."""
 
-import sys
-sys.path.insert(0, "/Users/anzony.quisperojas/Documents/GitHub/python/hysplit")
+import pytest
 
-import pandas as pd
-from pathlib import Path
+from hysplit import (
+    hysplit_trajectory,
+    create_trajectory_model,
+    set_config,
+    set_ascdata,
+)
 
-# Import hysplit
-from hysplit.io.readers import trajectory_read
 
-# Set working directory
-test_dir = Path("/Users/anzony.quisperojas/Documents/GitHub/python/hysplit/tests/comparison")
+def test_package_imports():
+    """Test that main package exports are importable."""
+    import hysplit
 
-# Read trajectory file
-print("Reading trajectory file with hysplit...")
-traj_df = trajectory_read(test_dir)
+    assert hasattr(hysplit, "__version__")
+    assert hasattr(hysplit, "hysplit_trajectory")
+    assert hasattr(hysplit, "create_trajectory_model")
+    assert hasattr(hysplit, "set_config")
+    assert hasattr(hysplit, "set_ascdata")
 
-# Print summary
-print(f"\nDataFrame dimensions: {traj_df.shape[0]} rows, {traj_df.shape[1]} columns")
 
-print("\nColumn names:")
-print(list(traj_df.columns))
+def test_version_string():
+    """Test that version string is properly formatted."""
+    import hysplit
 
-print("\nData types:")
-print(traj_df.dtypes)
+    version = hysplit.__version__
+    assert isinstance(version, str)
+    assert len(version.split(".")) >= 2  # At least major.minor
 
-print("\nFirst few rows:")
-print(traj_df.head(15))
 
-print("\nSummary statistics:")
-numeric_cols = ["lat", "lon", "height", "pressure"]
-available_cols = [c for c in numeric_cols if c in traj_df.columns]
-if available_cols:
-    print(traj_df[available_cols].describe())
+def test_create_trajectory_model():
+    """Test that trajectory model can be created."""
+    model = create_trajectory_model()
 
-# Write to CSV for comparison
-output_path = test_dir / "python_output.csv"
-traj_df.to_csv(output_path, index=False)
-print(f"\nOutput written to {output_path}")
+    assert model is not None
+    assert hasattr(model, "add_trajectory_params")
+    assert hasattr(model, "run")
+
+
+def test_set_config_defaults():
+    """Test that set_config returns valid defaults."""
+    config = set_config()
+
+    assert config.tratio == 0.75
+    assert config.numpar == 2500
+    assert config.maxpar == 10000
+
+
+def test_set_config_custom_values():
+    """Test that set_config accepts custom values."""
+    config = set_config(numpar=5000, maxpar=20000)
+
+    assert config.numpar == 5000
+    assert config.maxpar == 20000
+
+
+def test_set_ascdata():
+    """Test that set_ascdata returns valid configuration."""
+    ascdata = set_ascdata()
+
+    assert ascdata is not None
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
